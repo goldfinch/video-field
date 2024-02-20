@@ -1,0 +1,6 @@
+---
+Name: goldfinch-video-field
+---
+SilverStripe\Core\Injector\Injector:
+  Video:
+    class: Goldfinch\VideoField\ORM\FieldType\DBVideo
