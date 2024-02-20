@@ -1,0 +1,1 @@
+(function(n){n(document).ready(()=>{}),n(".cms-edit-form").entwine({onmatch(e){this._super(e)},onunmatch(e){this._super(e)},onaftersubmitform(e,t){}}),n.entwine("ss",e=>{e("[data-goldfinch-video-field]").entwine({onmatch(){}})})})(jQuery);

@@ -1,0 +1,12 @@
+{
+  "src/video-styles.scss": {
+    "file": "video-styles.js",
+    "isEntry": true,
+    "src": "src/video-styles.scss"
+  },
+  "src/video.js": {
+    "file": "video.js",
+    "isEntry": true,
+    "src": "src/video.js"
+  }
+}
