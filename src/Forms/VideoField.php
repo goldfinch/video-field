@@ -8,14 +8,16 @@ use SilverStripe\Assets\Folder;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\ArrayData;
 use SilverStripe\Forms\FormField;
+use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\View\Requirements;
 use SilverStripe\Forms\LiteralField;
 use Symfony\Component\Finder\Finder;
-use Goldfinch\VideoField\ORM\FieldType\DBVideo;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\FieldType\DBHTMLText;
 use Symfony\Component\Filesystem\Filesystem;
+use Goldfinch\JSONEditor\Forms\JSONEditorField;
+use Goldfinch\VideoField\ORM\FieldType\DBVideo;
 
 class VideoField extends FormField
 {
@@ -65,44 +67,55 @@ class VideoField extends FormField
         );
     }
 
-    public function getCurrentVideos()
-    {
-        $cfg = $this->videosSetConfig;
-        $value = $this->getKeyField()->dataValue();
-        if ($value) {
-            $values = explode(',', $value);
-        }
-        $videosList = $this->videosList;
+    // public function getCurrentVideos()
+    // {
+    //     $cfg = $this->videosSetConfig;
+    //     $value = $this->getKeyField()->dataValue();
+    //     if ($value) {
+    //         $values = explode(',', $value);
+    //     }
+    //     $videosList = $this->videosList;
 
-        $html = '';
+    //     $html = '';
 
-        $count = 0;
+    //     $count = 0;
 
-        if (isset($values)) {
+    //     if (isset($values)) {
 
-            $count = count($values);
+    //         $count = count($values);
 
-            foreach ($values as $v) {
-                $video = $this->getVideoByKey($v);
+    //         foreach ($values as $v) {
+    //             $video = $this->getVideoByKey($v);
 
-                if (isset($video['admin_template'])) {
-                    $html .= '<li data-value="'.$v.'">' . $video['admin_template'] . '</li>';
-                }
-            }
-        }
+    //             if (isset($video['admin_template'])) {
+    //                 $html .= '<li data-value="'.$v.'">' . $video['admin_template'] . '</li>';
+    //             }
+    //         }
+    //     }
 
-        $return = DBHTMLText::create();
-        $return->setValue('<ul data-count="'.$count.'">'.$html.'</ul>');
+    //     $return = DBHTMLText::create();
+    //     $return->setValue('<ul data-count="'.$count.'">'.$html.'</ul>');
 
-        return $return;
-    }
+    //     return $return;
+    // }
 
-    public function __construct($set, $name, $title = null, $value = '', $static = false)
+    public function __construct($parent, $name, $title = null, $value = '', $static = false)
     {
         $this->setName($name);
-        $this->fieldData = HiddenField::create("{$name}[Data]", 'Data');
 
-        $this->fieldData->setAttribute('data-goldfinch-video', 'data');
+        $schema = file_get_contents(BASE_PATH . '/vendor/goldfinch/video-field/_schema/video.json');
+
+        $this->fieldData = JSONEditorField::create(
+            "{$name}[Data]",
+            'Data',
+            $parent,
+            [],
+            '{}',
+            null,
+            $schema,
+        );
+
+        // $this->fieldData->setAttribute('data-goldfinch-video', 'data');
 
         $this->buildKeyField();
 
@@ -110,16 +123,10 @@ class VideoField extends FormField
 
         if (!$static) {
 
-            $this->setVideosSet($set);
-
             Requirements::css('goldfinch/video-field:client/dist/video-styles.css');
             Requirements::javascript('goldfinch/video-field:client/dist/video.js');
 
             $this->setVideosList();
-        }
-
-        if (!$this->videosSetConfig) {
-            $this->setDescription('<span style="color: red">The set <b>'.$set.'</b> does not exist in YAML config.</span>');
         }
 
         parent::__construct($name, $title, $value);
@@ -456,15 +463,15 @@ class VideoField extends FormField
             ? $this->fieldKey->dataValue()
             : null;
 
-        $field = HiddenField::create("{$name}[Key]", 'Key');
+        $field = TextField::create("{$name}[Key]", 'Key');
 
-        $field->setReadonly($this->isReadonly());
-        $field->setDisabled($this->isDisabled());
-        if ($keyValue) {
-            $field->setValue($keyValue);
-        }
+        // $field->setReadonly($this->isReadonly());
+        // $field->setDisabled($this->isDisabled());
+        // if ($keyValue) {
+        //     $field->setValue($keyValue);
+        // }
 
-        $field->setAttribute('data-goldfinch-video', 'key');
+        // $field->setAttribute('data-goldfinch-video', 'key');
 
         $this->fieldKey = $field;
         return $field;
@@ -494,16 +501,14 @@ class VideoField extends FormField
             return $this;
         }
 
-        if (is_string($value)) {
-            $value = $this->dataBundle($value);
-        } else {
-            $value = $this->dataBundle($value['Key']);
-            $value['Data'] = json_encode($value['Data']);
-        }
+        $value['Key'] = $value['Key'];
+        $value['Data'] = $value['Data'];
 
         // Update each field
-        $this->fieldKey->setSubmittedValue($value['Key'], $value);
-        $this->fieldData->setSubmittedValue($value['Data'], $value);
+        $this->fieldKey->setValue($value['Key']);
+        $this->fieldData->setValue($value['Data']);
+        // $this->fieldKey->setSubmittedValue($value['Key'], $value);
+        // $this->fieldData->setSubmittedValue($value['Data'], $value);
 
         // Get data value
         $this->value = $this->dataValue();
@@ -530,7 +535,7 @@ class VideoField extends FormField
 
         // dump(2, $this->dataBundle($value->getKey()));
         // if (!isset($stock['Data']) || !$stock['Data']) {
-        $stock = $this->dataBundle($value->getKey());
+        // $stock = $this->dataBundle($value->getKey());
         // }
 
         // Save value
@@ -541,25 +546,25 @@ class VideoField extends FormField
         return $this;
     }
 
-    private function dataBundle($key)
-    {
-        $set = $this->videosSetConfig;
-        $item = $this->getVideoByKey($key);
+    // private function dataBundle($key)
+    // {
+    //     $set = $this->videosSetConfig;
+    //     $item = $this->getVideoByKey($key);
 
-        return [
-            'Key' => $key,
-            'Data' => [
-                'set' => [
-                    'name' => $this->videosSet,
-                    'type' => isset($set['type']) ? $set['type'] : null,
-                    // 'source' => $set['source'],
-                ],
-                'title' => $item && isset($item['title']) ? $item['title'] : '',
-                // 'value' => $item && isset($item['value']) ? $item['value'] : null,
-                'source' => $item && isset($item['source']) ? $item['source'] : '',
-            ],
-        ];
-    }
+    //     return [
+    //         'Key' => $key,
+    //         'Data' => [
+    //             'set' => [
+    //                 'name' => $this->videosSet,
+    //                 'type' => isset($set['type']) ? $set['type'] : null,
+    //                 // 'source' => $set['source'],
+    //             ],
+    //             'title' => $item && isset($item['title']) ? $item['title'] : '',
+    //             // 'value' => $item && isset($item['value']) ? $item['value'] : null,
+    //             'source' => $item && isset($item['source']) ? $item['source'] : '',
+    //         ],
+    //     ];
+    // }
 
     /**
      * Get value as DBVideo object useful for formatting the number
@@ -583,7 +588,7 @@ class VideoField extends FormField
     public function Value()
     {
         // Localised
-        return $this->getDBVideo()->getValue()->Nice();
+        return $this->getDBVideo()->getValue(); // ->Nice();
     }
 
     /**
@@ -599,54 +604,46 @@ class VideoField extends FormField
             $dataField = "{$fieldName}Data";
 
             $dataObject->$keyField = $this->fieldKey->dataValue();
-
-            if (
-                $dataObject->$keyField &&
-                $dataObject->$keyField != ''
-            ) {
-                $dataObject->$dataField = $this->fieldData->dataValue();
-            } else {
-                $dataObject->$dataField = null;
-            }
+            $dataObject->$dataField = $this->fieldData->dataValue();
         }
     }
 
     /**
      * Returns a readonly version of this field.
      */
-    public function performReadonlyTransformation()
-    {
-        $clone = clone $this;
-        $clone->setReadonly(true);
-        return $clone;
-    }
+    // public function performReadonlyTransformation()
+    // {
+    //     $clone = clone $this;
+    //     $clone->setReadonly(true);
+    //     return $clone;
+    // }
 
-    public function setReadonly($bool)
-    {
-        parent::setReadonly($bool);
+    // public function setReadonly($bool)
+    // {
+    //     parent::setReadonly($bool);
 
-        $this->fieldData->setReadonly($bool);
-        $this->fieldKey->setReadonly($bool);
+    //     $this->fieldData->setReadonly($bool);
+    //     $this->fieldKey->setReadonly($bool);
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function setDisabled($bool)
-    {
-        parent::setDisabled($bool);
+    // public function setDisabled($bool)
+    // {
+    //     parent::setDisabled($bool);
 
-        $this->fieldData->setDisabled($bool);
-        $this->fieldKey->setDisabled($bool);
+    //     $this->fieldData->setDisabled($bool);
+    //     $this->fieldKey->setDisabled($bool);
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
-    public function videoHidePreview()
-    {
-        $this->addExtraClass('goldfinch-video-hide-preview');
+    // public function videoHidePreview()
+    // {
+    //     $this->addExtraClass('goldfinch-video-hide-preview');
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
      * Validate this field
@@ -654,15 +651,15 @@ class VideoField extends FormField
      * @param Validator $validator
      * @return bool
      */
-    public function validate($validator)
-    {
-        // return $this->extendValidationResult($result, $validator);
-    }
+    // public function validate($validator)
+    // {
+    //     // return $this->extendValidationResult($result, $validator);
+    // }
 
-    public function setForm($form)
-    {
-        $this->fieldKey->setForm($form);
-        $this->fieldData->setForm($form);
-        return parent::setForm($form);
-    }
+    // public function setForm($form)
+    // {
+    //     $this->fieldKey->setForm($form);
+    //     $this->fieldData->setForm($form);
+    //     return parent::setForm($form);
+    // }
 }

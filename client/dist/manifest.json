@@ -1,6 +1,6 @@
 {
   "src/video-styles.scss": {
-    "file": "video-styles.js",
+    "file": "video-styles.css",
     "isEntry": true,
     "src": "src/video-styles.scss"
   },

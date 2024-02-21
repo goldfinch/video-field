@@ -3,8 +3,8 @@
 namespace Goldfinch\VideoField\ORM\FieldType;
 
 use Goldfinch\VideoField\Forms\VideoField;
-use PhpTek\JSONText\ORM\FieldType\JSONText;
 use SilverStripe\ORM\FieldType\DBComposite;
+use Goldfinch\JSONEditor\ORM\FieldType\DBJSONText;
 
 class DBVideo extends DBComposite
 {
@@ -21,7 +21,7 @@ class DBVideo extends DBComposite
      */
     private static $composite_db = [
         'Key' => 'Varchar(255)',
-        'Data' => JSONText::class,
+        'Data' => DBJSONText::class,
     ];
 
     private static $casting = [
