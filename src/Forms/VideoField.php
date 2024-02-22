@@ -35,21 +35,6 @@ class VideoField extends FormField
     protected $fieldData = null;
 
     /**
-     * @var FormField
-     */
-    protected $fieldKey = null;
-
-    /**
-     * Gets field for the key selector
-     *
-     * @return FormField
-     */
-    public function getKeyField()
-    {
-        return $this->fieldKey;
-    }
-
-    /**
      * Gets field for the data input
      *
      * @return HiddenField
@@ -117,7 +102,7 @@ class VideoField extends FormField
 
         // $this->fieldData->setAttribute('data-goldfinch-video', 'data');
 
-        $this->buildKeyField();
+        // $this->buildKeyField();
 
         $this->initSetsRequirements();
 
@@ -447,67 +432,20 @@ class VideoField extends FormField
     public function __clone()
     {
         $this->fieldData = clone $this->fieldData;
-        $this->fieldKey = clone $this->fieldKey;
-    }
-
-    /**
-     * Builds a new video key field
-     *
-     * @return FormField
-     */
-    protected function buildKeyField()
-    {
-        $name = $this->getName();
-
-        $keyValue = $this->fieldKey
-            ? $this->fieldKey->dataValue()
-            : null;
-
-        $field = TextField::create("{$name}[Key]", 'Key');
-
-        // $field->setReadonly($this->isReadonly());
-        // $field->setDisabled($this->isDisabled());
-        // if ($keyValue) {
-        //     $field->setValue($keyValue);
-        // }
-
-        // $field->setAttribute('data-goldfinch-video', 'key');
-
-        $this->fieldKey = $field;
-        return $field;
-    }
-
-    public function getVideoByKey($key)
-    {
-        $list = $this->videosList;
-        $item = null;
-
-        foreach ($list as $video) {
-            if ($video['value'] == $key) {
-                $item = $video;
-                break;
-            }
-        }
-
-        return $item;
     }
 
     public function setSubmittedValue($value, $data = null)
     {
         if (empty($value)) {
             $this->value = null;
-            $this->fieldKey->setValue(null);
             $this->fieldData->setValue(null);
             return $this;
         }
 
-        $value['Key'] = $value['Key'];
         $value['Data'] = $value['Data'];
 
         // Update each field
-        $this->fieldKey->setValue($value['Key']);
         $this->fieldData->setValue($value['Data']);
-        // $this->fieldKey->setSubmittedValue($value['Key'], $value);
         // $this->fieldData->setSubmittedValue($value['Data'], $value);
 
         // Get data value
@@ -519,14 +457,12 @@ class VideoField extends FormField
     {
         if (empty($value)) {
             $this->value = null;
-            $this->fieldKey->setValue(null);
             $this->fieldData->setValue(null);
             return $this;
         }
 
         if ($value instanceof DBVideo) {
             $stock = [
-                'Key' => $value->getKey(),
                 'Data' => $value->getData(),
             ];
         } else {
@@ -539,7 +475,6 @@ class VideoField extends FormField
         // }
 
         // Save value
-        $this->fieldKey->setValue($stock['Key']);
         $this->fieldData->setValue($stock['Data']);
         $this->value = $this->dataValue();
 
@@ -574,7 +509,6 @@ class VideoField extends FormField
     protected function getDBVideo()
     {
         return DBVideo::create_field('Video', [
-            'Key' => $this->fieldKey->dataValue(),
             'Data' => $this->fieldData->dataValue(),
         ]);
     }
@@ -600,10 +534,8 @@ class VideoField extends FormField
         if ($dataObject->hasMethod("set$fieldName")) {
             $dataObject->$fieldName = $this->getDBVideo();
         } else {
-            $keyField = "{$fieldName}Key";
             $dataField = "{$fieldName}Data";
 
-            $dataObject->$keyField = $this->fieldKey->dataValue();
             $dataObject->$dataField = $this->fieldData->dataValue();
         }
     }

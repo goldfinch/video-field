@@ -2,86 +2,212 @@
     "type": "object",
     "options": {},
     "properties": {
-        "advanced": {
-            "title": "Advanced settings",
+        "host": {
+            "title": "Platform",
+            "type": "string",
+            "format": "select",
+            "default": "youtube",
+            "options": {
+                "enum_titles": ["YouTube", "Vimeo"]
+            },
+            "enum": ["youtube", "vimeo"]
+        },
+        "id": {
+            "title": "Video ID",
+            "type": "string"
+        },
+        "display_settings": {
+            "title": "Display settings",
             "type": "boolean",
             "format": "checkbox",
             "default": false
         },
-        "autoplay": {
-            "title": "Autoplay",
-            "type": "boolean",
-            "description": "Specifies whether the initial video will automatically start to play when the player loads.",
-            "format": "checkbox",
-            "default": false
-        },
-        "controls": {
-            "title": "Controls",
-            "type": "boolean",
-            "description": "Indicates whether the video player controls are displayed",
-            "format": "checkbox",
-            "default": true
-        },
-        "start": {
-            "title": "Start",
-            "type": "number",
-            "description": "Causes the player to begin playing the video at the given number of seconds from the start of the video."
-        },
-        "end": {
-            "title": "End",
-            "type": "number",
-            "description": "Specifies the time, measured in seconds from the start of the video, when the player should stop playing the video."
-        },
-        "fs": {
-            "title": "Disable fullscreen",
-            "type": "boolean",
-            "description": "Prevents the fullscreen button from displaying in the player.",
-            "format": "checkbox",
-            "default": true
-        },
-        "iv_load_policy": {
-            "title": "Video annotations",
-            "type": "string",
-            "format": "select",
-            "default": "1",
+        "link": {
+            "type": "object",
             "options": {
-                "enum_titles": ["Display", "Hide"]
+                "containerAttributes": {
+                    "class": "as-none-object"
+                },
+                "dependencies": {
+                    "display_settings": true
+                }
             },
-            "enum": ["1", "3"]
-        },
-        "loop": {
-            "title": "Loop",
-            "type": "boolean",
-            "description": "Causes the player to play the initial video again and again",
-            "format": "checkbox",
-            "default": true
-        },
-        "mute": {
-            "title": "Muted video",
-            "type": "boolean",
-            "description": "Set video to mute on load.",
-            "format": "checkbox",
-            "default": true
-        },
-        "quality": {
-            "title": "Quality",
-            "type": "string",
-            "format": "select",
-            "default": "auto",
-            "options": {
-                "enum_titles": ["auto"]
-            },
-            "enum": ["auto"]
-        },
-        "speed": {
-            "title": "Speed",
-            "type": "string",
-            "format": "select",
-            "default": "1",
-            "options": {
-                "enum_titles": ["1"]
-            },
-            "enum": ["1"]
+            "properties": {
+                "autoplay": {
+                    "title": "Autoplay",
+                    "type": "boolean",
+                    "description": "Specifies whether the initial video will automatically start to play when the player loads.",
+                    "format": "checkbox",
+                    "default": false
+                },
+                "controls": {
+                    "title": "Controls",
+                    "type": "boolean",
+                    "description": "Indicates whether the video player controls are displayed",
+                    "format": "checkbox",
+                    "default": true
+                },
+                "start": {
+                    "title": "Start",
+                    "type": "string",
+                    "description": "Causes the player to begin playing the video at the given number of seconds from the start of the video."
+                },
+                "end": {
+                    "title": "End",
+                    "type": "string",
+                    "description": "Specifies the time, measured in seconds from the start of the video, when the player should stop playing the video."
+                },
+                "fs": {
+                    "title": "Disable fullscreen",
+                    "type": "boolean",
+                    "description": "Prevents the fullscreen button from displaying in the player.",
+                    "format": "checkbox",
+                    "default": true
+                },
+                "iv_load_policy": {
+                    "title": "Video annotations",
+                    "type": "string",
+                    "format": "select",
+                    "default": "1",
+                    "options": {
+                        "enum_titles": ["Display", "Hide"]
+                    },
+                    "enum": ["1", "3"]
+                },
+                "loop": {
+                    "title": "Loop",
+                    "type": "boolean",
+                    "description": "Causes the player to play the initial video again and again",
+                    "format": "checkbox",
+                    "default": true
+                },
+                "mute": {
+                    "title": "Muted video",
+                    "type": "boolean",
+                    "description": "Set video to mute on load.",
+                    "format": "checkbox",
+                    "default": true
+                },
+                "quality": {
+                    "title": "Quality",
+                    "type": "string",
+                    "format": "select",
+                    "default": "auto",
+                    "options": {
+                        "enum_titles": ["auto"]
+                    },
+                    "enum": ["auto"]
+                },
+                "speed": {
+                    "title": "Speed",
+                    "type": "string",
+                    "format": "select",
+                    "default": "1",
+                    "options": {
+                        "enum_titles": ["1"]
+                    },
+                    "enum": ["1"]
+                }
+            }
+        }
+    },
+    "if": {
+        "properties": {
+            "display_settings": {
+                "const": true
+            }
+        }
+    },
+    "then": {
+        "properties": {
+            "link": {
+                "type": "object",
+                "options": {
+                    "containerAttributes": {
+                        "class": "as-none-object"
+                    },
+                    "dependencies": {
+                        "display_settings": true
+                    }
+                },
+                "properties": {
+                    "autoplay": {
+                        "title": "Autoplay",
+                        "type": "boolean",
+                        "description": "Specifies whether the initial video will automatically start to play when the player loads.",
+                        "format": "checkbox",
+                        "default": false
+                    },
+                    "controls": {
+                        "title": "Controls",
+                        "type": "boolean",
+                        "description": "Indicates whether the video player controls are displayed",
+                        "format": "checkbox",
+                        "default": true
+                    },
+                    "start": {
+                        "title": "Start",
+                        "type": "string",
+                        "description": "Causes the player to begin playing the video at the given number of seconds from the start of the video."
+                    },
+                    "end": {
+                        "title": "End",
+                        "type": "string",
+                        "description": "Specifies the time, measured in seconds from the start of the video, when the player should stop playing the video."
+                    },
+                    "fs": {
+                        "title": "Disable fullscreen",
+                        "type": "boolean",
+                        "description": "Prevents the fullscreen button from displaying in the player.",
+                        "format": "checkbox",
+                        "default": true
+                    },
+                    "iv_load_policy": {
+                        "title": "Video annotations",
+                        "type": "string",
+                        "format": "select",
+                        "default": "1",
+                        "options": {
+                            "enum_titles": ["Display", "Hide"]
+                        },
+                        "enum": ["1", "3"]
+                    },
+                    "loop": {
+                        "title": "Loop",
+                        "type": "boolean",
+                        "description": "Causes the player to play the initial video again and again",
+                        "format": "checkbox",
+                        "default": true
+                    },
+                    "mute": {
+                        "title": "Muted video",
+                        "type": "boolean",
+                        "description": "Set video to mute on load.",
+                        "format": "checkbox",
+                        "default": true
+                    },
+                    "quality": {
+                        "title": "Quality",
+                        "type": "string",
+                        "format": "select",
+                        "default": "auto",
+                        "options": {
+                            "enum_titles": ["auto"]
+                        },
+                        "enum": ["auto"]
+                    },
+                    "speed": {
+                        "title": "Speed",
+                        "type": "string",
+                        "format": "select",
+                        "default": "1",
+                        "options": {
+                            "enum_titles": ["1"]
+                        },
+                        "enum": ["1"]
+                    }
+                }
+            }
         }
     }
 }

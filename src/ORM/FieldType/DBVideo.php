@@ -20,7 +20,6 @@ class DBVideo extends DBComposite
      * @var array<string,string>
      */
     private static $composite_db = [
-        'Key' => 'Varchar(255)',
         'Data' => DBJSONText::class,
     ];
 
@@ -35,48 +34,48 @@ class DBVideo extends DBComposite
 
     public function getTag()
     {
-        $key = $this->getKey();
+        // $key = $this->getKey();
 
-        if ($key) {
-            $data = json_decode($this->getData(), true);
+        // if ($key) {
+        //     $data = json_decode($this->getData(), true);
 
-            $field = $this->scaffoldFormField($this->getName(), ['static' => true]);
+        //     $field = $this->scaffoldFormField($this->getName(), ['static' => true]);
 
-            if ($field) {
-                return $field->renderVideoTemplate($data + [
-                    'color' => $this->videoColor,
-                    'size' => $this->videoSize,
-                ], false, $data['set'], $key);
-            }
-        }
+        //     if ($field) {
+        //         return $field->renderVideoTemplate($data + [
+        //             'color' => $this->videoColor,
+        //             'size' => $this->videoSize,
+        //         ], false, $data['set'], $key);
+        //     }
+        // }
     }
 
     public function URL()
     {
-        $key = $this->getKey();
+        // $key = $this->getKey();
 
-        if ($key) {
-            $data = json_decode($this->getData(), true);
+        // if ($key) {
+        //     $data = json_decode($this->getData(), true);
 
-            if ($data && isset($data['source'])) {
-                return $data['source'];
-            }
-        }
+        //     if ($data && isset($data['source'])) {
+        //         return $data['source'];
+        //     }
+        // }
     }
 
     public function Title()
     {
-        $key = $this->getKey();
+        // $key = $this->getKey();
 
-        if ($key) {
-            $data = json_decode($this->getData(), true);
+        // if ($key) {
+        //     $data = json_decode($this->getData(), true);
 
-            if ($data && isset($data['title']) && $data['title'] && $data['title'] != '') {
-                return $data['title'];
-            } else {
-                return $key;
-            }
-        }
+        //     if ($data && isset($data['title']) && $data['title'] && $data['title'] != '') {
+        //         return $data['title'];
+        //     } else {
+        //         return $key;
+        //     }
+        // }
     }
 
     public function Size($size)
@@ -93,22 +92,22 @@ class DBVideo extends DBComposite
         return $this;
     }
 
-    public function getParse($key = null)
-    {
-        $data = $this->getData();
+    // public function getParse($key = null)
+    // {
+    //     $data = $this->getData();
 
-        if (!$data) {
-            return null;
-        }
+    //     if (!$data) {
+    //         return null;
+    //     }
 
-        $data = json_decode($data, true);
+    //     $data = json_decode($data, true);
 
-        $parse = [
-            'set' => $data['set'],
-        ];
+    //     $parse = [
+    //         'set' => $data['set'],
+    //     ];
 
-        return $key ? (isset($parse[$key]) ? $parse[$key] : null) : $parse;
-    }
+    //     return $key ? (isset($parse[$key]) ? $parse[$key] : null) : $parse;
+    // }
 
     public function getVideoSetName()
     {
@@ -130,34 +129,15 @@ class DBVideo extends DBComposite
             return null;
         }
 
-        // $data = $this->getData();
+        $data = $this->getData();
 
-        $key = $this->getKey();
+        // $key = $this->getKey();
 
         // if (empty($key)) {
         //     return $data;
         // }
 
-        return $key; // $data . ' ' . $key;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKey()
-    {
-        return $this->getField('Key');
-    }
-
-    /**
-     * @param string $key
-     * @param bool $markChanged
-     * @return $this
-     */
-    public function setKey($key, $markChanged = true)
-    {
-        $this->setField('Key', $key, $markChanged);
-        return $this;
+        return $data; // $data . ' ' . $key;
     }
 
     /**
