@@ -1,20 +1,23 @@
 (function ($) {
 
-  var currentEditorID, currentEditor, currentPreview, currentEditorInput, currentDetectorInput;
+  var currentEditorID, currentPreview, currentEditorInput, currentDetectorInput;
 
-  function afterEditorInit(editor) {
-    currentEditor = editor
+  function afterEditorInit() {
 
     initPreview()
   }
 
   function initPreview() {
-    const data = currentEditor.getValue()
-    if (data.host && data.id) {
-      currentPreview.html('<a href="'+getEmbededUrl(data)+'" class="ss-ui-dialog-link"><img src="'+getPreviewImage(data)+'" alt="Preview"></a>')
-      currentPreview.addClass('goldfinchvideo__preview--display')
-    } else {
-      currentPreview.removeClass('goldfinchvideo__preview--display')
+    const editor = getEditor();
+
+    if (editor) {
+      const data = editor.getValue()
+      if (data.host && data.id) {
+        currentPreview.html('<a href="'+getEmbededUrl(data)+'" class="ss-ui-dialog-link"><img src="'+getPreviewImage(data)+'" alt="Preview"></a>')
+        currentPreview.addClass('goldfinchvideo__preview--display')
+      } else {
+        currentPreview.removeClass('goldfinchvideo__preview--display')
+      }
     }
   }
 
@@ -38,7 +41,7 @@
     return url
   }
 
-  function detectHostPlatform(link, id) {
+  function detectHostPlatform(link) {
 
     var host, videoID
 
@@ -52,14 +55,14 @@
 
     if (host && videoID) {
 
-      const editor = currentEditor ? currentEditor : (window.jsoneditor ? window.jsoneditor[id] : null)
+      const editor = getEditor(); // currentEditor ? currentEditor : (window.jsoneditor ? window.jsoneditor[id] : null)
 
       if (editor) {
         var currentVal = editor.getValue();
 
         currentVal['host'] = host
         currentVal['id'] = videoID
-
+        console.log('edit', editor, currentVal)
         editor.setValue(currentVal)
 
         initPreview()
@@ -82,14 +85,22 @@
     }
   }
 
+  function editorInit(editor) {
+    afterEditorInit()
+  }
+
+  function getEditor() {
+    return window.jsoneditor ? window.jsoneditor[currentEditorID] : null
+  }
+
   $(document).ready(() => {
     let vc = 0;
     var vint = setInterval(() => {
       vc++;
-      const editor = window.jsoneditor ? window.jsoneditor[currentEditorID] : null
+      const editor = getEditor()
       if (editor) {
         clearInterval(vint)
-        afterEditorInit(editor)
+        editorInit(editor)
       }
       if (vc > 5) {
         clearInterval(vint)
@@ -106,6 +117,7 @@
     },
     onaftersubmitform(event, data) {
       currentPreview = $(this).find('[data-goldfinch-video-preview]');
+      editorInit(getEditor())
       initPreview()
     },
   });
@@ -121,7 +133,7 @@
         currentEditorID = currentEditorInput.attr('id')
 
         currentDetectorInput.on('keyup', (e) => {
-          detectHostPlatform(e.target.value, currentEditorInput.attr('id'))
+          detectHostPlatform(e.target.value)
         })
       },
     });
