@@ -24,7 +24,7 @@
   function getPreviewImage(data) {
     let url
     if (data.host == 'youtube') {
-      url = 'https://img.youtube.com/vi/'+data.id+'/sddefault.jpg'
+      url = 'https://img.youtube.com/vi/'+data.id+'/mqdefault.jpg'
     } else if (data.host == 'vimeo') {
       url = 'https://vumbnail.com/'+data.id+'_large.jpg'
     }

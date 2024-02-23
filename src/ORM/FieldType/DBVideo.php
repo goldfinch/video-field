@@ -315,49 +315,37 @@ class DBVideo extends DBComposite
         return null;
     }
 
-    public function getHostData()
+    public function hostData($param = null)
     {
         $data = $this->getVideoData();
 
-        $str = '';
+        if (isset($data['hostdata_json']) && $data['hostdata_json'] != '') {
+            $data = json_decode($data['hostdata_json'], true);
 
+            if (isset($data['html'])) {
+
+                $html = DBHTMLText::create();
+                $html->setValue($data['html']);
+                $data['html'] = $html;
+            }
+
+            if ($param && isset($data[$param])) {
+                return $data[$param];
+            } else if ($data) {
+                return ArrayData::create($data);
+            }
+        }
+    }
+
+    public function fetchOembed($data)
+    {
         if ($data['host'] == 'youtube') {
             $str = 'https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='.$data['id'].'&format=json';
         } else if ($data['host'] == 'vimeo') {
             $str = 'https://vimeo.com/api/oembed.json?url=https://player.vimeo.com/video/' . $data['id'];
         }
 
-        $content = file_get_contents($str);
-
-        if ($content) {
-
-            // TODO: save db?
-
-            return ArrayData::create($this->niceHostData($content));
-        }
-    }
-
-    public function niceHostData($content)
-    {
-        $data = $this->getVideoData();
-
-        $content = json_decode($content, true);
-
-        $html = DBHTMLText::create();
-        $html->setValue($content['html']);
-        $content['html'] = $html;
-
-        if ($data['host'] == 'youtube') {
-
-            //
-
-        } else if ($data['host'] == 'vimeo') {
-
-            //
-
-        }
-
-        return $content;
+        return isset($str) ? file_get_contents($str) : null;
     }
 
     /**

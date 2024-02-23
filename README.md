@@ -8,8 +8,6 @@
 
 YouTube & Vimeo video field for Silverstripe. Store video data for further manipulation. Enchant links with parameters through friendly interface, display thumbnails, fetching video data like title, description and more with no extra actions.
 
-❗ Not all options are finished yet.
-
 ## Install
 
 ```bash

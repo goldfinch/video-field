@@ -23,6 +23,12 @@
             "description": "If this is turned on, next save will fetch video data (title, description, etc.)",
             "default": false
         },
+        "hostdata_json": {
+            "options": {
+                "hidden": true
+            },
+            "type": "string"
+        },
         "advanced_settings": {
             "title": "Advanced settings",
             "type": "boolean",
