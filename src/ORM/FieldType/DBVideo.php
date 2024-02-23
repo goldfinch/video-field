@@ -63,7 +63,18 @@ class DBVideo extends DBComposite
 
     public function getVideoData()
     {
-        return json_decode($this->getData(), true);
+        if ($this->getData()) {
+            $data = $this->getData();
+        } else {
+            // set empty data to escape errors
+            $data = json_encode([
+                'host' => '',
+                'id' => '',
+                'advanced_settings' => false,
+            ]);
+        }
+
+        return json_decode($data, true);
     }
 
     public function url()
