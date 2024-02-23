@@ -2,7 +2,9 @@
 
 namespace Goldfinch\VideoField\ORM\FieldType;
 
+use SilverStripe\View\ArrayData;
 use Goldfinch\VideoField\Forms\VideoField;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\ORM\FieldType\DBComposite;
 use Goldfinch\JSONEditor\ORM\FieldType\DBJSONText;
 
@@ -16,6 +18,31 @@ class DBVideo extends DBComposite
     protected $videoSize = null;
     protected $videoColor = null;
 
+    protected $youtubeThumbs = [
+        'default' => 'default',
+        'media' => 'mqdefault',
+        'high' => 'hqdefault',
+        'standard' => 'sddefault',
+        'max' => 'maxresdefault',
+    ];
+
+    protected $youtubeCasualThumbs = [
+        'hq720',
+        '0',
+        '1',
+        '2',
+        '3',
+        'sd1',
+        'sd2',
+        'sd3',
+        'mq1',
+        'mq2',
+        'mq3',
+        'hq1',
+        'hq2',
+        'hq3',
+    ];
+
     /**
      * @var array<string,string>
      */
@@ -24,99 +51,313 @@ class DBVideo extends DBComposite
     ];
 
     private static $casting = [
-        // 'getTag' => 'HTMLFragment',
+        'iframe' => 'HTMLFragment',
+        'thumbnail' => 'HTMLFragment',
+        'dumpAllThumbnails' => 'HTMLFragment',
     ];
 
     public function forTemplate()
     {
-        return $this->getTag();
+        return $this->url();
     }
 
-    public function getTag()
+    public function getVideoData()
     {
-        // $key = $this->getKey();
+        return json_decode($this->getData(), true);
+    }
 
-        // if ($key) {
-        //     $data = json_decode($this->getData(), true);
+    public function url()
+    {
+        return $this->plainURL() . $this->bundleParams();
+    }
 
-        //     $field = $this->scaffoldFormField($this->getName(), ['static' => true]);
+    public function plainUrl()
+    {
+        $data = $this->getVideoData();
 
-        //     if ($field) {
-        //         return $field->renderVideoTemplate($data + [
-        //             'color' => $this->videoColor,
-        //             'size' => $this->videoSize,
-        //         ], false, $data['set'], $key);
+        $str = '';
+
+        if ($data['host'] == 'youtube') {
+            $str = 'https://www.youtube.com/watch?v=' . $data['id'];
+        } else if ($data['host'] == 'vimeo') {
+            $str = 'https://vimeo.com/' . $data['id'];
+        }
+
+        return $str;
+    }
+
+    public function embedURL()
+    {
+        return $this->plainEmbedURL() . $this->bundleParams(true);
+    }
+
+    public function plainEmbedURL()
+    {
+        $data = $this->getVideoData();
+
+        $str = '';
+
+        if ($data['host'] == 'youtube') {
+            $str = 'https://www.youtube.com/embed/' . $data['id'];
+        } else if ($data['host'] == 'vimeo') {
+            $str = 'https://player.vimeo.com/video/' . $data['id'];
+        }
+
+        return $str;
+    }
+
+    public function iframe($width = null, $height = null)
+    {
+        $data = $this->getVideoData();
+
+        $str = '';
+
+        if ($data['host'] == 'youtube') {
+            if (!$width) $width = 560;
+            if (!$height) $height = 315;
+            $str = '<iframe src="'.$this->embedURL().'" width="'.$width.'" height="'.$height.'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+        } else if ($data['host'] == 'vimeo') {
+            if (!$width) $width = 640;
+            if (!$height) $height = 360;
+            $str = '<iframe src="'.$this->embedURL().'" width="'.$width.'" height="'.$height.'" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+        }
+
+        return $str;
+    }
+
+    public function dumpAllThumbnails()
+    {
+        $data = $this->getVideoData();
+
+        $str = '';
+
+        if ($data['host'] == 'youtube') {
+            foreach ($this->youtubeThumbs as $key => $thumb) {
+                $str .= '<div><strong>'.$key.'</strong><br><img src="'.$this->thumbnailUrl($key).'" alt="Thumbnail"></div>';
+            }
+            foreach ($this->youtubeCasualThumbs as $thumb) {
+                $str .= '<div><strong>'.$thumb.'</strong><br><img src="'.$this->thumbnailUrl($thumb).'" alt="Thumbnail"></div>';
+            }
+        } else if ($data['host'] == 'vimeo') {
+            $str = '';
+        }
+
+        return $str;
+    }
+
+    public function thumbnail($type = 'default')
+    {
+        $data = $this->getVideoData();
+
+        $str = '';
+
+        if ($data['host'] == 'youtube') {
+            $str = $this->thumbnailUrl($type) ? '<img src="'.$this->thumbnailUrl($type).'" alt="Thumbnail">' : '';
+        } else if ($data['host'] == 'vimeo') {
+            $str = '';
+        }
+
+        return $str;
+    }
+
+    public function thumbnailUrl($type = 'default')
+    {
+        $data = $this->getVideoData();
+
+        $str = '';
+
+        // for ($x = 0; $x < sizeof($resolution); $x++) {
+        //     $url = '//img.youtube.com/vi/' . $id . '/' . $resolution[$x] . '.jpg';
+        //     if (get_headers($url)[0] == 'HTTP/1.0 200 OK') {
+        //         break;
         //     }
         // }
+
+        if ($data['host'] == 'youtube') {
+
+            if (isset($this->youtubeThumbs[$type])) {
+                $key = $this->youtubeThumbs[$type];
+            } else if (in_array($type, $this->youtubeCasualThumbs)) {
+                $key = $type;
+            }
+
+            if (isset($key)) {
+                $str = 'https://img.youtube.com/vi/'.$data['id'].'/'.$key.'.jpg';
+            }
+        } else if ($data['host'] == 'vimeo') {
+
+            $str = '';
+        }
+
+        return $str;
     }
 
-    public function URL()
+    public function bundleParams($embed = false)
     {
-        // $key = $this->getKey();
+        $data = $this->getVideoData();
 
-        // if ($key) {
-        //     $data = json_decode($this->getData(), true);
+        if ($data['advanced_settings'])
+        {
+            $params = [];
 
-        //     if ($data && isset($data['source'])) {
-        //         return $data['source'];
-        //     }
-        // }
+            if ($data['host'] == 'youtube') {
+
+                if ($embed) {
+                    // embed links
+
+                    if ($this->getSetting('autoplay'))
+                    {
+                        $params['autoplay'] = $this->getSetting('autoplay');
+                    }
+
+                    if (!$this->getSetting('rel'))
+                    {
+                        $params['rel'] = $this->getSetting('rel');
+                    }
+
+                    if ($this->getSetting('loop'))
+                    {
+                        $params['loop'] = $this->getSetting('loop');
+                    }
+
+                    if (!$this->getSetting('controls'))
+                    {
+                        $params['controls'] = $this->getSetting('controls');
+                    }
+
+                    if ($this->getSetting('fs'))
+                    {
+                        $params['fs'] = !$this->getSetting('fs');
+                    }
+
+                    if ($start = $this->getSetting('start'))
+                    {
+                        $params['start'] = $start;
+                    }
+
+                    if ($end = $this->getSetting('end'))
+                    {
+                        $params['end'] = $end;
+                    }
+
+                    if ($cc_load_policy = $this->getSetting('cc_load_policy'))
+                    {
+                        $params['cc_load_policy'] = $cc_load_policy;
+                    }
+
+                    return count($params) ? '?' . http_build_query($params) : '';
+
+                } else {
+                    // basic links
+
+                    if ($start = $this->getSetting('start'))
+                    {
+                        $params['t'] = $start . 's';
+                    }
+
+                    return count($params) ? '&' . http_build_query($params) : '';
+                }
+
+
+
+            } else if ($data['host'] == 'vimeo') {
+
+                if ($embed) {
+                    // embed links
+
+                    if ($this->getSetting('autoplay'))
+                    {
+                        $params['autoplay'] = $this->getSetting('autoplay');
+                    }
+
+                    if (!$this->getSetting('controls'))
+                    {
+                        $params['controls'] = $this->getSetting('controls');
+                    }
+
+                    if ($this->getSetting('loop'))
+                    {
+                        $params['loop'] = $this->getSetting('loop');
+                    }
+
+                    if ($this->getSetting('muted'))
+                    {
+                        $params['muted'] = $this->getSetting('muted');
+                    }
+
+                    return count($params) ? '?' . http_build_query($params) : '';
+                } else {
+                    // basic links
+
+                    if ($start = $this->getSetting('start'))
+                    {
+                        $params['t'] = $start;
+                    }
+
+                    return count($params) ? '#' . http_build_query($params, ) : '';
+                }
+
+            }
+        }
+
+        return '';
     }
 
-    public function Title()
+    public function getSetting($name)
     {
-        // $key = $this->getKey();
+        $data = $this->getVideoData();
 
-        // if ($key) {
-        //     $data = json_decode($this->getData(), true);
+        if ($data['advanced_settings'])
+        {
+            return isset($data['settings'][$name]) ? $data['settings'][$name] : null;
+        }
 
-        //     if ($data && isset($data['title']) && $data['title'] && $data['title'] != '') {
-        //         return $data['title'];
-        //     } else {
-        //         return $key;
-        //     }
-        // }
+        return null;
     }
 
-    public function Size($size)
+    public function getHostData()
     {
-        $this->videoSize = $size;
+        $data = $this->getVideoData();
 
-        return $this;
+        $str = '';
+
+        if ($data['host'] == 'youtube') {
+            $str = 'https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='.$data['id'].'&format=json';
+        } else if ($data['host'] == 'vimeo') {
+            $str = 'https://vimeo.com/api/oembed.json?url=https://player.vimeo.com/video/' . $data['id'];
+        }
+
+        $content = file_get_contents($str);
+
+        if ($content) {
+
+            // TODO: save db?
+
+            return ArrayData::create($this->niceHostData($content));
+        }
     }
 
-    public function Color($color)
+    public function niceHostData($content)
     {
-        $this->videoColor = $color;
+        $data = $this->getVideoData();
 
-        return $this;
-    }
+        $content = json_decode($content, true);
 
-    // public function getParse($key = null)
-    // {
-    //     $data = $this->getData();
+        $html = DBHTMLText::create();
+        $html->setValue($content['html']);
+        $content['html'] = $html;
 
-    //     if (!$data) {
-    //         return null;
-    //     }
+        if ($data['host'] == 'youtube') {
 
-    //     $data = json_decode($data, true);
+            //
 
-    //     $parse = [
-    //         'set' => $data['set'],
-    //     ];
+        } else if ($data['host'] == 'vimeo') {
 
-    //     return $key ? (isset($parse[$key]) ? $parse[$key] : null) : $parse;
-    // }
+            //
 
-    public function getVideoSetName()
-    {
-        return $this->getParse('set')['name'];
-    }
+        }
 
-    public function getVideoType()
-    {
-        return $this->getParse('set')['type'];
+        return $content;
     }
 
     /**
@@ -131,13 +372,7 @@ class DBVideo extends DBComposite
 
         $data = $this->getData();
 
-        // $key = $this->getKey();
-
-        // if (empty($key)) {
-        //     return $data;
-        // }
-
-        return $data; // $data . ' ' . $key;
+        return $data;
     }
 
     /**

@@ -98,7 +98,7 @@ class VideoField extends FormField
             '{}',
             null,
             $schema,
-        );
+        )->compact()->nolabel();
 
         // $this->fieldData->setAttribute('data-goldfinch-video', 'data');
 

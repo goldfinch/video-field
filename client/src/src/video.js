@@ -62,7 +62,6 @@
 
         currentVal['host'] = host
         currentVal['id'] = videoID
-        console.log('edit', editor, currentVal)
         editor.setValue(currentVal)
 
         initPreview()
