@@ -11,6 +11,13 @@ use Goldfinch\JSONEditor\ORM\FieldType\DBJSONText;
 class DBVideo extends DBComposite
 {
     /**
+     * Vimeo API
+     * https://help.vimeo.com/hc/en-us/articles/12426260232977-Player-parameters-overview
+     *
+     * YouTube API
+     * https://developers.google.com/youtube/player_parameters
+     */
+    /**
      * @var string $locale
      */
     protected $locale = null;
