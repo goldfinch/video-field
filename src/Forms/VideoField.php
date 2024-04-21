@@ -473,17 +473,22 @@ class VideoField extends FormField
         // if (!isset($stock['Data']) || !$stock['Data']) {
         // $stock = $this->dataBundle($value->getKey());
         // }
-        $data = json_decode($stock['Data'], true);
 
-        if (isset($data['hostdata'])) {
-            // fetch data
-            $content = $this->getDBVideo()->fetchOembed($data);
-            $data['hostdata_json'] = $content;
-            $stock['Data'] = json_encode($data);
+        if (isset($stock['Data'])) {
+
+            $data = json_decode($stock['Data'], true);
+
+            if (isset($data['hostdata'])) {
+                // fetch data
+                $content = $this->getDBVideo()->fetchOembed($data);
+                $data['hostdata_json'] = $content;
+                $stock['Data'] = json_encode($data);
+            }
+
+            // Save value
+            $this->fieldData->setValue($stock['Data']);
         }
 
-        // Save value
-        $this->fieldData->setValue($stock['Data']);
         $this->value = $this->dataValue();
 
         return $this;

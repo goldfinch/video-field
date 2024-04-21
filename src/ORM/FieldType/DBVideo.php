@@ -357,13 +357,18 @@ class DBVideo extends DBComposite
 
     public function fetchOembed($data)
     {
-        if ($data['host'] == 'youtube') {
-            $str = 'https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='.$data['id'].'&format=json';
-        } else if ($data['host'] == 'vimeo') {
-            $str = 'https://vimeo.com/api/oembed.json?url=https://player.vimeo.com/video/' . $data['id'];
-        }
+        if (isset($data['id']) && $data['id']) {
 
-        return isset($str) ? file_get_contents($str) : null;
+            if ($data['host'] == 'youtube') {
+                $str = 'https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='.$data['id'].'&format=json';
+            } else if ($data['host'] == 'vimeo') {
+                $str = 'https://vimeo.com/api/oembed.json?url=https://player.vimeo.com/video/' . $data['id'];
+            }
+
+            return isset($str) ? file_get_contents($str) : null;
+        } else {
+            return null;
+        }
     }
 
     /**
