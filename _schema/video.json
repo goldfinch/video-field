@@ -20,7 +20,7 @@
             "title": "API oembed data",
             "type": "boolean",
             "format": "checkbox",
-            "description": "If this is turned on, next save will fetch video data (title, description, etc.)",
+            "description": "If on, next save will fetch video data (title, description, etc.) and save it in the database",
             "default": false
         },
         "hostdata_json": {

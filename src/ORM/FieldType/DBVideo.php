@@ -172,7 +172,7 @@ class DBVideo extends DBComposite
         if ($data['host'] == 'youtube') {
             $str = $this->thumbnailUrl($type) ? '<img src="'.$this->thumbnailUrl($type).'" alt="Thumbnail">' : '';
         } else if ($data['host'] == 'vimeo') {
-            $str = '';
+            $str = $this->thumbnailUrl($type) ? '<img src="'.$this->thumbnailUrl($type).'" alt="Thumbnail">' : '';
         }
 
         return $str;
@@ -203,8 +203,16 @@ class DBVideo extends DBComposite
                 $str = 'https://img.youtube.com/vi/'.$data['id'].'/'.$key.'.jpg';
             }
         } else if ($data['host'] == 'vimeo') {
-
             $str = '';
+            $hostdata = $this->hostData();
+
+            if ($hostdata) {
+                $hostdata = $this->hostData()->toMap();
+
+                if (count($hostdata) && isset($hostdata['thumbnail_url'])) {
+                    $str = $hostdata['thumbnail_url'];
+                }
+            }
         }
 
         return $str;
@@ -357,7 +365,7 @@ class DBVideo extends DBComposite
 
     public function fetchOembed($data)
     {
-        if (isset($data['id']) && $data['id']) {
+        if (strpos($data['id'], 'http:') === false && strpos($data['id'], 'https:') === false && strpos($data['id'], 'youtube.com') === false && strpos($data['id'], 'vimeo.com') === false && isset($data['id']) && $data['id']) {
 
             if ($data['host'] == 'youtube') {
                 $str = 'https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='.$data['id'].'&format=json';

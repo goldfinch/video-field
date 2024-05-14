@@ -32,6 +32,7 @@ VideoField::create($this, 'Video')
 ```html
 <!-- template.ss -->
 
+<!-- General -->
 $Video.url
 $Video.embedUrl
 $Video.plainUrl
@@ -43,10 +44,53 @@ $Video.thumbnailUrl(standard)
 $Video.thumbnail
 $Video.thumbnail(standard)
 <%-- $Video.dumpAllThumbnails --%>
-$Video.hostData.html
+
+<!-- Youtube (API oembed data) -->
 $Video.hostData.title
+$Video.hostData.author_name
+$Video.hostData.author_url
+$Video.hostData.type
+$Video.hostData.height
+$Video.hostData.width
+$Video.hostData.version
+$Video.hostData.provider_name
+$Video.hostData.provider_url
+$Video.hostData.thumbnail_height
+$Video.hostData.thumbnail_width
+$Video.hostData.thumbnail_url
+$Video.hostData.html
+
+<!-- Vimeo (API oembed data) -->
+$Video.hostData.type
+$Video.hostData.version
+$Video.hostData.provider_name
+$Video.hostData.provider_url
+$Video.hostData.title
+$Video.hostData.author_name
+$Video.hostData.author_url
+$Video.hostData.is_plus
+$Video.hostData.account_type
+$Video.hostData.html
+$Video.hostData.width
+$Video.hostData.height
+$Video.hostData.duration
 $Video.hostData.description
+$Video.hostData.thumbnail_url
+$Video.hostData.thumbnail_width
+$Video.hostData.thumbnail_height
+$Video.hostData.thumbnail_url_with_play_button
+$Video.hostData.upload_date
+$Video.hostData.video_id
+$Video.hostData.uri
 ```
+
+## Previews
+
+#### Video fields
+![Video fields](screenshots/video-fields.png)
+#### Video settings
+![Video settings](screenshots/video-field-settings.png)
+
 ## License
 
 The MIT License (MIT)

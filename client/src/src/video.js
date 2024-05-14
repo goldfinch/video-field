@@ -2,13 +2,20 @@
 
   var currentEditorID, currentPreview, currentEditorInput, currentDetectorInput;
 
+  var allEditors = []
+
   function afterEditorInit() {
 
     initPreview()
   }
 
-  function initPreview() {
-    const editor = getEditor();
+  function initPreview(editor) {
+
+    if (!editor) {
+      const editor = getEditor();
+    }
+
+    currentPreview = jQuery(editor.element.closest('[data-goldfinch-video-field]').querySelector('[data-goldfinch-video-preview]'))
 
     if (editor) {
       const data = editor.getValue()
@@ -41,7 +48,7 @@
     return url
   }
 
-  function detectHostPlatform(link) {
+  function detectHostPlatform(link, el) {
 
     var host, videoID
 
@@ -55,7 +62,7 @@
 
     if (host && videoID) {
 
-      const editor = getEditor(); // currentEditor ? currentEditor : (window.jsoneditor ? window.jsoneditor[id] : null)
+      const editor = getEditor(el.getAttribute('data-field-id')); // currentEditor ? currentEditor : (window.jsoneditor ? window.jsoneditor[id] : null)
 
       if (editor) {
         var currentVal = editor.getValue();
@@ -64,7 +71,7 @@
         currentVal['id'] = videoID
         editor.setValue(currentVal)
 
-        initPreview()
+        initPreview(editor)
 
         // currentDetectorInput.val('')
       }
@@ -88,11 +95,22 @@
     afterEditorInit()
   }
 
-  function getEditor() {
-    return window.jsoneditor ? window.jsoneditor[currentEditorID] : null
+  function getEditor(id) {
+
+    return window.jsoneditor ? window.jsoneditor[id] : null
+  }
+
+  function initAllPreviews() {
+    allEditors.map((i,k) => {
+      if (!i.previewInit) {
+        initPreview(getEditor(i.id))
+        allEditors[k].previewInit = true
+      }
+    })
   }
 
   $(document).ready(() => {
+
     let vc = 0;
     var vint = setInterval(() => {
       vc++;
@@ -124,15 +142,23 @@
   $.entwine('ss', ($) => {
     $('[data-goldfinch-video-field]').entwine({
       onmatch() {
-        currentDetectorInput = $(this).find('[data-goldfinch-video-link-detector]');
-        currentPreview = $(this).find('[data-goldfinch-video-preview]');
 
         const editorEl = $(this).find('.json-editor');
         currentEditorInput = editorEl.next();
+
+        currentDetectorInput = currentEditorInput.closest('[data-goldfinch-video-field]').find('[data-goldfinch-video-link-detector]');
+        currentPreview = currentEditorInput.closest('[data-goldfinch-video-field]').find('[data-goldfinch-video-preview]');
+
         currentEditorID = currentEditorInput.attr('id')
+        currentDetectorInput[0].setAttribute('data-field-id', currentEditorID)
+
+        allEditors.push({id: currentEditorID, previewInit: false})
+
+        setTimeout(() => initAllPreviews(), 500)
 
         currentDetectorInput.on('keyup', (e) => {
-          detectHostPlatform(e.target.value)
+
+          detectHostPlatform(e.target.value, e.target)
         })
       },
     });
