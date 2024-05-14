@@ -86,10 +86,8 @@ $Video.hostData.uri
 
 ## Previews
 
-#### Video fields
-![Video fields](screenshots/video-fields.png)
-#### Video settings
-![Video settings](screenshots/video-field-settings.png)
+#### Video fields & settings
+![Video fields](screenshots/video-fields-settings)
 
 ## License
 
