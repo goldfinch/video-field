@@ -138,7 +138,14 @@ class DBVideo extends DBComposite
             if (! $height) {
                 $height = 315;
             }
-            $str = '<iframe src="'.$this->embedURL().'" width="'.$width.'" height="'.$height.'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+            $str =
+                '<iframe src="'.
+                $this->embedURL().
+                '" width="'.
+                $width.
+                '" height="'.
+                $height.
+                '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
         } elseif ($data['host'] == 'vimeo') {
             if (! $width) {
                 $width = 640;
@@ -146,7 +153,14 @@ class DBVideo extends DBComposite
             if (! $height) {
                 $height = 360;
             }
-            $str = '<iframe src="'.$this->embedURL().'" width="'.$width.'" height="'.$height.'" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
+            $str =
+                '<iframe src="'.
+                $this->embedURL().
+                '" width="'.
+                $width.
+                '" height="'.
+                $height.
+                '" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>';
         }
 
         return $str;
@@ -160,10 +174,20 @@ class DBVideo extends DBComposite
 
         if ($data['host'] == 'youtube') {
             foreach ($this->youtubeThumbs as $key => $thumb) {
-                $str .= '<div><strong>'.$key.'</strong><br><img src="'.$this->thumbnailUrl($key).'" alt="Thumbnail"></div>';
+                $str .=
+                    '<div><strong>'.
+                    $key.
+                    '</strong><br><img src="'.
+                    $this->thumbnailUrl($key).
+                    '" alt="Thumbnail"></div>';
             }
             foreach ($this->youtubeCasualThumbs as $thumb) {
-                $str .= '<div><strong>'.$thumb.'</strong><br><img src="'.$this->thumbnailUrl($thumb).'" alt="Thumbnail"></div>';
+                $str .=
+                    '<div><strong>'.
+                    $thumb.
+                    '</strong><br><img src="'.
+                    $this->thumbnailUrl($thumb).
+                    '" alt="Thumbnail"></div>';
             }
         } elseif ($data['host'] == 'vimeo') {
             $str = '';
@@ -201,7 +225,6 @@ class DBVideo extends DBComposite
         // }
 
         if ($data['host'] == 'youtube') {
-
             if (isset($this->youtubeThumbs[$type])) {
                 $key = $this->youtubeThumbs[$type];
             } elseif (in_array($type, $this->youtubeCasualThumbs)) {
@@ -235,7 +258,6 @@ class DBVideo extends DBComposite
             $params = [];
 
             if ($data['host'] == 'youtube') {
-
                 if ($embed) {
                     // embed links
 
@@ -272,7 +294,6 @@ class DBVideo extends DBComposite
                     }
 
                     return count($params) ? '?'.http_build_query($params) : '';
-
                 } else {
                     // basic links
 
@@ -282,9 +303,7 @@ class DBVideo extends DBComposite
 
                     return count($params) ? '&'.http_build_query($params) : '';
                 }
-
             } elseif ($data['host'] == 'vimeo') {
-
                 if ($embed) {
                     // embed links
 
@@ -314,7 +333,6 @@ class DBVideo extends DBComposite
 
                     return count($params) ? '#'.http_build_query($params) : '';
                 }
-
             }
         }
 
@@ -340,7 +358,6 @@ class DBVideo extends DBComposite
             $data = json_decode($data['hostdata_json'], true);
 
             if (isset($data['html'])) {
-
                 $html = DBHTMLText::create();
                 $html->setValue($data['html']);
                 $data['html'] = $html;
@@ -356,10 +373,17 @@ class DBVideo extends DBComposite
 
     public function fetchOembed($data)
     {
-        if (strpos($data['id'], 'http:') === false && strpos($data['id'], 'https:') === false && strpos($data['id'], 'youtube.com') === false && strpos($data['id'], 'vimeo.com') === false && isset($data['id']) && $data['id']) {
-
+        if (
+            strpos($data['id'], 'http:') === false &&
+            strpos($data['id'], 'https:') === false &&
+            strpos($data['id'], 'youtube.com') === false &&
+            strpos($data['id'], 'vimeo.com') === false &&
+            isset($data['id']) &&
+            $data['id']
+        ) {
             if ($data['host'] == 'youtube') {
-                $str = 'https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='.$data['id'].'&format=json';
+                $str =
+                    'https://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='.$data['id'].'&format=json';
             } elseif ($data['host'] == 'vimeo') {
                 $str = 'https://vimeo.com/api/oembed.json?url=https://player.vimeo.com/video/'.$data['id'];
             }
@@ -465,7 +489,7 @@ class DBVideo extends DBComposite
             $static = false;
         }
 
-        if (! isset($params['set']['name']) && $data = $this->getData()) {
+        if (! isset($params['set']['name']) && ($data = $this->getData())) {
             $params = json_decode($data, true);
             if (isset($params['set']['name'])) {
                 $set = $params['set']['name'];

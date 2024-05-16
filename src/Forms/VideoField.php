@@ -47,7 +47,7 @@ class VideoField extends FormField
     {
         return LiteralField::create(
             $this->getName().'Video',
-            '<div class="ggp__preview" data-goldfinch-video="preview"></div>',
+            '<div class="ggp__preview" data-goldfinch-video="preview"></div>'
         );
     }
 
@@ -89,15 +89,9 @@ class VideoField extends FormField
 
         $schema = file_get_contents(BASE_PATH.'/vendor/goldfinch/video-field/_schema/video.json');
 
-        $this->fieldData = JSONEditorField::create(
-            "{$name}[Data]",
-            'Data',
-            $parent,
-            [],
-            '{}',
-            null,
-            $schema,
-        )->compact()->nolabel();
+        $this->fieldData = JSONEditorField::create("{$name}[Data]", 'Data', $parent, [], '{}', null, $schema)
+            ->compact()
+            ->nolabel();
 
         // $this->fieldData->setAttribute('data-goldfinch-video', 'data');
 
@@ -106,7 +100,6 @@ class VideoField extends FormField
         $this->initSetsRequirements();
 
         if (! $static) {
-
             Requirements::css('goldfinch/video-field:client/dist/video-styles.css');
             Requirements::javascript('goldfinch/video-field:client/dist/video.js');
 
@@ -152,8 +145,7 @@ class VideoField extends FormField
         }
 
         if ($cfg['type'] == 'font') {
-
-            $fs = new Filesystem;
+            $fs = new Filesystem();
 
             $schema = BASE_PATH.'/app/_schema/video-'.$this->videosSet.'.json';
 
@@ -162,7 +154,6 @@ class VideoField extends FormField
                 $content = json_decode($content, true);
 
                 if ($content && is_array($content) && count($content)) {
-
                     $schemaList = $content;
 
                     foreach ($schemaList as $k => $sl) {
@@ -180,16 +171,13 @@ class VideoField extends FormField
                     }
                 }
             }
-
         } elseif ($cfg['type'] == 'dir') {
-
             $sourcePath = '/'.$cfg['source'];
 
             $finder = new Finder();
             $files = $finder->in(PUBLIC_PATH.$sourcePath)->files();
 
             foreach ($files as $file) {
-
                 $filename = $file->getFilename();
                 $ex = explode('.', $filename);
 
@@ -203,18 +191,16 @@ class VideoField extends FormField
                 $item['template'] = $this->renderVideoTemplate($item);
                 $schemaList[] = $item;
             }
-
         } elseif ($cfg['type'] == 'upload') {
-
-            $targetFolder = File::get()->filter(['ClassName' => Folder::class, 'Name' => $cfg['source']])->first();
+            $targetFolder = File::get()
+                ->filter(['ClassName' => Folder::class, 'Name' => $cfg['source']])
+                ->first();
 
             if ($targetFolder) {
-
                 $folder = File::get()->byID(1);
 
                 if ($folder && $folder == Folder::class) {
                     foreach ($folder->myChildren() as $file) {
-
                         $item = [
                             'title' => $file->Title,
                             'value' => $file->ID,
@@ -229,10 +215,8 @@ class VideoField extends FormField
             } else {
                 // specified folder in .yml is not found
             }
-
         } elseif ($cfg['type'] == 'json') {
-
-            $fs = new Filesystem;
+            $fs = new Filesystem();
 
             $schema = BASE_PATH.'/app/_schema/'.$cfg['source'];
 
@@ -241,7 +225,6 @@ class VideoField extends FormField
                 $content = json_decode($content, true);
 
                 if ($content && is_array($content) && count($content)) {
-
                     $schemaList = $content;
 
                     foreach ($schemaList as $k => $sl) {
@@ -259,7 +242,6 @@ class VideoField extends FormField
                     }
                 }
             }
-
         }
 
         $this->videosList = $schemaList;
@@ -287,21 +269,13 @@ class VideoField extends FormField
         }
 
         if ($cfg['type'] == 'font') {
-
             $template = $primaryPath.'FontItem';
-
         } elseif ($cfg['type'] == 'dir') {
-
             $template = $primaryPath.'DirItem';
-
         } elseif ($cfg['type'] == 'upload') {
-
             $template = $primaryPath.'UploadItem';
-
         } elseif ($cfg['type'] == 'json') {
-
             $template = $primaryPath.'JsonItem';
-
         }
 
         if ($value) {
@@ -320,9 +294,7 @@ class VideoField extends FormField
         }
 
         if ($admin) {
-
             if ($cfg['type'] == 'upload' || $cfg['type'] == 'dir' || $cfg['type'] == 'json') {
-
                 $inlineStyle = [
                     'display' => 'inline-block',
                     'width' => '32px',
@@ -334,14 +306,11 @@ class VideoField extends FormField
                     'background-color' => '#43536d',
                 ];
             }
-
         } else {
-
             $inlineStyle = [];
 
             // defaults
             if ($cfg['type'] == 'upload' || $cfg['type'] == 'dir' || $cfg['type'] == 'json') {
-
                 $inlineStyle = [
                     'display' => 'inline-block',
                     'width' => '32px',
@@ -386,7 +355,9 @@ class VideoField extends FormField
             }
         }
 
-        return $this->customise(ArrayData::create(['Video' => $item, 'InlineStyle' => $inlineStyleStr]))->renderWith($template)->RAW();
+        return $this->customise(ArrayData::create(['Video' => $item, 'InlineStyle' => $inlineStyleStr]))
+            ->renderWith($template)
+            ->RAW();
     }
 
     private function setVideosSet($set): void
@@ -473,7 +444,6 @@ class VideoField extends FormField
         // }
 
         if (isset($stock['Data'])) {
-
             $data = json_decode($stock['Data'], true);
 
             if (isset($data['hostdata'])) {
