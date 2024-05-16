@@ -2,7 +2,12 @@
     "name": "goldfinch/video-field",
     "description": "YouTube & Vimeo video field for Silverstripe. Store video data for further manipulation. Enchant links with parameters through friendly interface, display thumbnails, fetching video data like title, description and more with no extra actions",
     "type": "silverstripe-vendormodule",
-    "keywords": ["silverstripe", "video-field", "videos-field", "silverstripe-video"],
+    "keywords": [
+        "silverstripe",
+        "video-field",
+        "videos-field",
+        "silverstripe-video"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -18,7 +23,9 @@
         "goldfinch/silverstripe-jsontext": "^2.1"
     },
     "extra": {
-        "expose": ["client/dist"]
+        "expose": [
+            "client/dist"
+        ]
     },
     "autoload": {
         "psr-4": {

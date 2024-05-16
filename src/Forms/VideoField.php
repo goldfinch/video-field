@@ -2,22 +2,21 @@
 
 namespace Goldfinch\VideoField\Forms;
 
+use Goldfinch\JSONEditor\Forms\JSONEditorField;
+use Goldfinch\VideoField\ORM\FieldType\DBVideo;
 use InvalidArgumentException;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
-use SilverStripe\ORM\ArrayList;
-use SilverStripe\View\ArrayData;
 use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\HiddenField;
-use SilverStripe\View\Requirements;
 use SilverStripe\Forms\LiteralField;
-use Symfony\Component\Finder\Finder;
+use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\DataObjectInterface;
 use SilverStripe\ORM\FieldType\DBHTMLText;
+use SilverStripe\View\ArrayData;
+use SilverStripe\View\Requirements;
 use Symfony\Component\Filesystem\Filesystem;
-use Goldfinch\JSONEditor\Forms\JSONEditorField;
-use Goldfinch\VideoField\ORM\FieldType\DBVideo;
+use Symfony\Component\Finder\Finder;
 
 class VideoField extends FormField
 {
@@ -47,7 +46,7 @@ class VideoField extends FormField
     public function getPreviewField()
     {
         return LiteralField::create(
-            $this->getName() . 'Video',
+            $this->getName().'Video',
             '<div class="ggp__preview" data-goldfinch-video="preview"></div>',
         );
     }
@@ -88,7 +87,7 @@ class VideoField extends FormField
     {
         $this->setName($name);
 
-        $schema = file_get_contents(BASE_PATH . '/vendor/goldfinch/video-field/_schema/video.json');
+        $schema = file_get_contents(BASE_PATH.'/vendor/goldfinch/video-field/_schema/video.json');
 
         $this->fieldData = JSONEditorField::create(
             "{$name}[Data]",
@@ -106,7 +105,7 @@ class VideoField extends FormField
 
         $this->initSetsRequirements();
 
-        if (!$static) {
+        if (! $static) {
 
             Requirements::css('goldfinch/video-field:client/dist/video-styles.css');
             Requirements::javascript('goldfinch/video-field:client/dist/video.js');
@@ -148,7 +147,7 @@ class VideoField extends FormField
         */
         $schemaList = [];
 
-        if (!isset($cfg['type'])) {
+        if (! isset($cfg['type'])) {
             return;
         }
 
@@ -156,7 +155,7 @@ class VideoField extends FormField
 
             $fs = new Filesystem;
 
-            $schema = BASE_PATH . '/app/_schema/video-' . $this->videosSet . '.json';
+            $schema = BASE_PATH.'/app/_schema/video-'.$this->videosSet.'.json';
 
             if ($fs->exists($schema)) {
                 $content = file_get_contents($schema);
@@ -167,28 +166,27 @@ class VideoField extends FormField
                     $schemaList = $content;
 
                     foreach ($schemaList as $k => $sl) {
-                        if (!isset($sl['value']) || $sl['value'] == '') {
+                        if (! isset($sl['value']) || $sl['value'] == '') {
                             $sl['value'] = $k;
                         }
 
                         $sl['admin_template'] = $this->renderVideoAdminTemplate($sl);
 
-                        if (!isset($sl['template']) || $sl['template'] == '') {
+                        if (! isset($sl['template']) || $sl['template'] == '') {
                             $sl['template'] = $this->renderVideoTemplate($sl);
                         }
-
 
                         $schemaList[$k] = $sl;
                     }
                 }
             }
 
-        } else if ($cfg['type'] == 'dir') {
+        } elseif ($cfg['type'] == 'dir') {
 
-            $sourcePath = '/' . $cfg['source'];
+            $sourcePath = '/'.$cfg['source'];
 
             $finder = new Finder();
-            $files = $finder->in(PUBLIC_PATH . $sourcePath)->files();
+            $files = $finder->in(PUBLIC_PATH.$sourcePath)->files();
 
             foreach ($files as $file) {
 
@@ -198,7 +196,7 @@ class VideoField extends FormField
                 $item = [
                     'title' => '',
                     'value' => $ex[0],
-                    'source' => $sourcePath . '/' . $filename,
+                    'source' => $sourcePath.'/'.$filename,
                 ];
 
                 $item['admin_template'] = $this->renderVideoAdminTemplate($item);
@@ -206,7 +204,7 @@ class VideoField extends FormField
                 $schemaList[] = $item;
             }
 
-        } else if ($cfg['type'] == 'upload') {
+        } elseif ($cfg['type'] == 'upload') {
 
             $targetFolder = File::get()->filter(['ClassName' => Folder::class, 'Name' => $cfg['source']])->first();
 
@@ -232,11 +230,11 @@ class VideoField extends FormField
                 // specified folder in .yml is not found
             }
 
-        } else if ($cfg['type'] == 'json') {
+        } elseif ($cfg['type'] == 'json') {
 
             $fs = new Filesystem;
 
-            $schema = BASE_PATH . '/app/_schema/' . $cfg['source'];
+            $schema = BASE_PATH.'/app/_schema/'.$cfg['source'];
 
             if ($fs->exists($schema)) {
                 $content = file_get_contents($schema);
@@ -247,16 +245,15 @@ class VideoField extends FormField
                     $schemaList = $content;
 
                     foreach ($schemaList as $k => $sl) {
-                        if (!isset($sl['value']) || $sl['value'] == '') {
+                        if (! isset($sl['value']) || $sl['value'] == '') {
                             $sl['value'] = $k;
                         }
 
                         $sl['admin_template'] = $this->renderVideoAdminTemplate($sl);
 
-                        if (!isset($sl['template']) || $sl['template'] == '') {
+                        if (! isset($sl['template']) || $sl['template'] == '') {
                             $sl['template'] = $this->renderVideoTemplate($sl);
                         }
-
 
                         $schemaList[$k] = $sl;
                     }
@@ -268,8 +265,6 @@ class VideoField extends FormField
         $this->videosList = $schemaList;
     }
 
-
-
     private function renderVideoAdminTemplate($item): string
     {
         return $this->renderVideoTemplate($item, true);
@@ -277,7 +272,7 @@ class VideoField extends FormField
 
     public function renderVideoTemplate($item, $admin = false, $set = null, $value = null): string
     {
-        if (!$set) {
+        if (! $set) {
             $cfg = $this->videosSetConfig;
         } else {
             $cfg = $set;
@@ -293,19 +288,19 @@ class VideoField extends FormField
 
         if ($cfg['type'] == 'font') {
 
-            $template = $primaryPath . 'FontItem';
+            $template = $primaryPath.'FontItem';
 
-        } else if ($cfg['type'] == 'dir') {
+        } elseif ($cfg['type'] == 'dir') {
 
-            $template = $primaryPath . 'DirItem';
+            $template = $primaryPath.'DirItem';
 
-        } else if ($cfg['type'] == 'upload') {
+        } elseif ($cfg['type'] == 'upload') {
 
-            $template = $primaryPath . 'UploadItem';
+            $template = $primaryPath.'UploadItem';
 
-        } else if ($cfg['type'] == 'json') {
+        } elseif ($cfg['type'] == 'json') {
 
-            $template = $primaryPath . 'JsonItem';
+            $template = $primaryPath.'JsonItem';
 
         }
 
@@ -313,7 +308,7 @@ class VideoField extends FormField
             $item['value'] = $value;
         }
 
-        if (!isset($item['title']) || !$item['title']) {
+        if (! isset($item['title']) || ! $item['title']) {
             $item['title'] = $item['value'];
         }
 
@@ -335,7 +330,7 @@ class VideoField extends FormField
                     'mask-size' => 'contain',
                     'mask-repeat' => 'no-repeat',
                     'mask-position' => 'center',
-                    'mask-image' => 'url(' . $item['source'] . ')',
+                    'mask-image' => 'url('.$item['source'].')',
                     'background-color' => '#43536d',
                 ];
             }
@@ -354,7 +349,7 @@ class VideoField extends FormField
                     'mask-size' => 'contain',
                     'mask-repeat' => 'no-repeat',
                     'mask-position' => 'center',
-                    'mask-image' => 'url(' . $item['source'] . ')',
+                    'mask-image' => 'url('.$item['source'].')',
                     'background-color' => '#43536d',
                 ];
             }
@@ -364,7 +359,7 @@ class VideoField extends FormField
             if (isset($item['color'])) {
                 if ($cfg['type'] == 'font') {
                     $inlineStyle['color'] = $item['color'];
-                } else if ($ext == 'svg') {
+                } elseif ($ext == 'svg') {
                     $inlineStyle['background-color'] = $item['color'];
                 }
             }
@@ -374,10 +369,10 @@ class VideoField extends FormField
 
                 if ($size) {
                     if ($cfg['type'] == 'font') {
-                        $inlineStyle['font-size'] = $item['size'] . 'px';
+                        $inlineStyle['font-size'] = $item['size'].'px';
                     } else {
-                        $inlineStyle['width'] = $item['size'] . 'px';
-                        $inlineStyle['height'] = $item['size'] . 'px';
+                        $inlineStyle['width'] = $item['size'].'px';
+                        $inlineStyle['height'] = $item['size'].'px';
                     }
                 }
             }
@@ -385,9 +380,9 @@ class VideoField extends FormField
 
         $inlineStyleStr = '';
 
-        if (!empty($inlineStyle)) {
+        if (! empty($inlineStyle)) {
             foreach ($inlineStyle as $prop => $style) {
-                $inlineStyleStr .= $prop . ':' . $style . ';';
+                $inlineStyleStr .= $prop.':'.$style.';';
             }
         }
 
@@ -439,6 +434,7 @@ class VideoField extends FormField
         if (empty($value)) {
             $this->value = null;
             $this->fieldData->setValue(null);
+
             return $this;
         }
 
@@ -450,6 +446,7 @@ class VideoField extends FormField
 
         // Get data value
         $this->value = $this->dataValue();
+
         return $this;
     }
 
@@ -458,6 +455,7 @@ class VideoField extends FormField
         if (empty($value)) {
             $this->value = null;
             $this->fieldData->setValue(null);
+
             return $this;
         }
 
@@ -539,7 +537,7 @@ class VideoField extends FormField
     }
 
     /**
-     * @param DataObjectInterface|Object $dataObject
+     * @param  DataObjectInterface|object  $dataObject
      */
     public function saveInto(DataObjectInterface $dataObject)
     {
@@ -593,7 +591,7 @@ class VideoField extends FormField
     /**
      * Validate this field
      *
-     * @param Validator $validator
+     * @param  Validator  $validator
      * @return bool
      */
     // public function validate($validator)
